@@ -513,7 +513,7 @@ static void qh_lines (
 				(scratch >> 16) & 0x7fff,
 				scratch,
 				td->urb);
-		printk("\n\t\ttd-%p%c%s len=%d %08x\n \t\turb %p t-flag-%x t-buf-%p t-dma-%x\n",
+		printk("\n\t\ttd-%p%c%s len=%d %08x\n \t\turb %p t-flag-%x t-buf-%x t-dma-%x\n",
 			td, mark, ({ char *tmp;
 			 switch ((scratch>>8)&0x03) {
 			 case 0: tmp = "out"; break;
@@ -585,13 +585,18 @@ static ssize_t fill_async_buffer(struct debug_buffer *buf)
 }
 
 
-static char array[BUF_SIZE];
 void print_async_list(void)
 {
 	struct debug_buffer dbg_buffer, *buf;
 	extern struct usb_hcd *ghcd_omap;
+	char *array;
 
-	memset(array, 0, BUF_SIZE);
+	array = kzalloc(BUF_SIZE, GFP_KERNEL);
+	if (!array) {
+		printk("\n EHCI : out of memory! \n");
+		return;
+	}
+
 	buf = &dbg_buffer;
 
 	buf->fill_func = fill_async_buffer;
@@ -616,9 +621,9 @@ void print_async_list(void)
 
 	printk("EHCI async list \n");
 	fill_async_buffer(buf);
-
 	//printk("%s\n", array);
 
+	kfree(array);
 }
 
 #define DBG_SCHED_LIMIT 64
