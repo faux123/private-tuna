@@ -411,6 +411,7 @@ static int twl6040_power(struct twl6040 *twl6040, int enable)
 		}
 		twl6040->pll = TWL6040_LPPLL_ID;
 		twl6040->sysclk = 19200000;
+		twl6040->mclk = 32768;
 	} else {
 		if (gpio_is_valid(audpwron)) {
 			/* use AUDPWRON line */
@@ -429,6 +430,7 @@ static int twl6040_power(struct twl6040 *twl6040, int enable)
 		}
 		twl6040->pll = TWL6040_NOPLL_ID;
 		twl6040->sysclk = 0;
+		twl6040->mclk = 0;
 	}
 
 	twl6040->powered = enable;
@@ -579,6 +581,7 @@ int twl6040_set_pll(struct twl6040 *twl6040, enum twl6040_pll_id id,
 	}
 
 	twl6040->sysclk = freq_out;
+	twl6040->mclk = freq_in;
 
 pll_out:
 	mutex_unlock(&twl6040->mutex);
